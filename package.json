@@ -1,0 +1,34 @@
+﻿{
+  "name": "clinica-connect-platform",
+  "version": "1.0.0",
+  "description": "MVP Cloud DevOps para uma plataforma de agendamentos clinicos com microsservicos, Docker, Kubernetes, CI/CD e observabilidade.",
+  "main": "src/services/api-gateway/server.js",
+  "scripts": {
+    "start": "node src/services/api-gateway/server.js",
+    "start:gateway": "node src/services/api-gateway/server.js",
+    "start:appointments": "node src/services/appointments/server.js",
+    "start:stock": "node src/services/stock/server.js",
+    "start:notifications": "node src/services/notifications/server.js",
+    "dev:gateway": "nodemon src/services/api-gateway/server.js",
+    "dev:appointments": "nodemon src/services/appointments/server.js",
+    "dev:stock": "nodemon src/services/stock/server.js",
+    "dev:notifications": "nodemon src/services/notifications/server.js",
+    "lint": "eslint src tests",
+    "test": "node tests/index.test.js"
+  },
+  "keywords": ["cloud", "devops", "microservices", "docker", "kubernetes", "healthcare"],
+  "author": "Victor",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.1",
+    "globals": "^17.11.0",
+    "nodemon": "^3.1.9"
+  }
+}

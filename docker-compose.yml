@@ -1,0 +1,113 @@
+﻿services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: clinica-connect-postgres
+    environment:
+      POSTGRES_USER: clinic_user
+      POSTGRES_PASSWORD: clinic_pass
+      POSTGRES_DB: clinic_connect
+    ports:
+      - "5543:5432"
+    volumes:
+      - clinic-data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinic_user -d clinic_connect"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - clinic-net
+
+  api-gateway:
+    build:
+      context: .
+      target: runtime
+    container_name: clinica-connect-gateway
+    command: ["node", "src/services/api-gateway/server.js"]
+    env_file: .env.example
+    ports:
+      - "3100:3100"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      appointments:
+        condition: service_started
+      stock:
+        condition: service_started
+      notifications:
+        condition: service_started
+    networks:
+      - clinic-net
+
+  appointments:
+    build:
+      context: .
+      target: runtime
+    container_name: clinica-connect-appointments
+    command: ["node", "src/services/appointments/server.js"]
+    env_file: .env.example
+    ports:
+      - "3101:3101"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      stock:
+        condition: service_started
+      notifications:
+        condition: service_started
+    networks:
+      - clinic-net
+
+  stock:
+    build:
+      context: .
+      target: runtime
+    container_name: clinica-connect-stock
+    command: ["node", "src/services/stock/server.js"]
+    env_file: .env.example
+    ports:
+      - "3102:3102"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - clinic-net
+
+  notifications:
+    build:
+      context: .
+      target: runtime
+    container_name: clinica-connect-notifications
+    command: ["node", "src/services/notifications/server.js"]
+    env_file: .env.example
+    ports:
+      - "3103:3103"
+    networks:
+      - clinic-net
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: clinica-connect-prometheus
+    ports:
+      - "9190:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - clinic-net
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    container_name: clinica-connect-jaeger
+    ports:
+      - "16687:16686"
+      - "4320:4318"
+    networks:
+      - clinic-net
+
+volumes:
+  clinic-data:
+
+networks:
+  clinic-net:
+    driver: bridge

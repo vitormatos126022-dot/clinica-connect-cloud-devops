@@ -1,0 +1,64 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifications
+  namespace: clinica-connect
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: notifications
+  template:
+    metadata:
+      labels:
+        app: notifications
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: notifications
+          image: ghcr.io/mendesfelipealmeida/clinica-connect-notifications:1.0.0
+          imagePullPolicy: IfNotPresent
+          command: ["node", "src/services/notifications/server.js"]
+          ports:
+            - containerPort: 3103
+          envFrom:
+            - configMapRef:
+                name: clinica-connect-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3103
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3103
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notifications
+  namespace: clinica-connect
+spec:
+  selector:
+    app: notifications
+  ports:
+    - name: http
+      port: 3103
+      targetPort: 3103

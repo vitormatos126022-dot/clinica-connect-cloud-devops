@@ -1,0 +1,15 @@
+﻿apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clinica-connect-config
+  namespace: clinica-connect
+data:
+  NODE_ENV: production
+  GATEWAY_PORT: "3100"
+  APPOINTMENTS_PORT: "3101"
+  STOCK_PORT: "3102"
+  NOTIFICATIONS_PORT: "3103"
+  APPOINTMENTS_URL: http://appointments:3101
+  STOCK_URL: http://stock:3102
+  NOTIFICATIONS_URL: http://notifications:3103
+  DATABASE_URL: postgres://clinic_user:clinic_pass@postgres:5432/clinic_connect
