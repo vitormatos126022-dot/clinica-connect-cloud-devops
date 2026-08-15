@@ -46,4 +46,3 @@ Mostrar `/metrics` e logs JSON. Explicar que tracing distribuido esta planejado 
 
 Concluir que o MVP padroniza ambiente, automatiza validacao, prepara deploy Kubernetes e melhora visibilidade operacional.
 
-Link do video: `COLE_AQUI_O_LINK_DO_VIDEO`

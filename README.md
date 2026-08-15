@@ -92,13 +92,6 @@ O projeto usa como referencia o case Sock Shop (`microservices-demo/microservice
 
 Metricas Prometheus e logs JSON com `requestId` estao implementados no codigo. O tracing distribuido nao esta totalmente implementado: Jaeger/OpenTelemetry estao definidos como proposta conceitual de evolucao.
 
-## Entregaveis
-
-- Parte teorica: `docs/parte-teorica.md`
-- Relatorio pratico: `docs/relatorio-pratico.md`
-- Roteiro do pitch: `docs/roteiro-video-pitch.md`
-- Link do video no YouTube: `COLE_AQUI_O_LINK_DO_VIDEO`
-
 ## Fontes Oficiais
 
 - Kubernetes: https://kubernetes.io/docs/
