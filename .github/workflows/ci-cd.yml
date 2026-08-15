@@ -12,7 +12,7 @@ env:
 
 jobs:
   test:
-    name: Build, lint and test
+    name: Build, lint and validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,6 +35,20 @@ jobs:
 
       - name: Validate Docker Compose
         run: docker compose config
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Validate Kubernetes manifests without cluster
+        run: kubectl apply --dry-run=client --validate=false -f k8s/
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Validate Terraform
+        run: |
+          terraform -chdir=terraform init -backend=false
+          terraform -chdir=terraform validate
 
   publish:
     name: Publish container images

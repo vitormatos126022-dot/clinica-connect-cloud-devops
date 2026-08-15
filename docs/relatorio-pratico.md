@@ -6,9 +6,10 @@ O MVP implementa uma plataforma de agendamentos clinicos baseada em microsservic
 
 ## 2. Ambiente local
 
-O ambiente local e iniciado com:
+O ambiente local usa Compose sem `container_name` fixo, reduzindo conflitos com containers antigos. Para limpar orfaos antes de subir:
 
 ```bash
+docker compose down --remove-orphans
 docker compose up --build
 ```
 
@@ -36,29 +37,34 @@ No CD, os manifests sao renderizados para usar `${GITHUB_SHA}`, garantindo que o
 
 O workflow possui tres jobs:
 
-- `test`: instala dependencias, roda lint, testes e valida Compose.
+- `test`: instala dependencias, roda lint, testes, valida Compose, valida manifests Kubernetes em modo client-side e executa `terraform validate`.
 - `publish`: publica imagens no GHCR com `${GITHUB_SHA}` e `latest`.
 - `deploy`: roda apenas com `ENABLE_K8S_DEPLOY=true`; renderiza manifests e aplica no Kubernetes.
 
-Esse desenho evita deploy sem verificacao e impede falha de producao quando nao ha cluster configurado no GitHub.
+Esse desenho evita deploy sem verificacao, cobre Compose/Kubernetes/Terraform no CI e impede falha de producao quando nao ha cluster configurado no GitHub. A validacao Kubernetes usa `kubectl apply --dry-run=client --validate=false`, portanto nao depende de cluster ativo.
 
-## 6. Observabilidade
+## 6. Terraform
+
+O Terraform e validado no GitHub Actions com `hashicorp/setup-terraform`, `terraform init -backend=false` e `terraform validate`. Assim, a validacao nao depende de Terraform instalado no Windows local.
+
+## 7. Observabilidade
 
 Todos os servicos expoem `/health` e `/metrics`. Os logs sao JSON e incluem `service`, `requestId`, metodo, rota, status e duracao. Prometheus coleta metricas. Jaeger/OpenTelemetry ficam como desenho conceitual de tracing distribuido.
 
-## 7. Case comparado: Sock Shop
+## 8. Case comparado: Sock Shop
 
 Sock Shop e uma demonstracao de microsservicos para loja online, usada para testar tecnologias cloud-native. A Clinica Connect usa os mesmos fundamentos, mas em um contexto clinico. A comparacao mostra que a tecnica pode ser aplicada em dominios diferentes: varejo, saude, logistica ou educacao.
 
 Fonte: https://github.com/microservices-demo/microservices-demo
 
-## 8. Como demonstrar
+## 9. Como demonstrar
 
 1. Rodar `npm run lint`.
 2. Rodar `npm test`.
-3. Rodar `docker compose up --build`.
-4. Abrir `http://localhost:3100`.
-5. Listar insumos em `/supplies`.
-6. Criar agendamento com `POST /appointments`.
-7. Mostrar Prometheus em `http://localhost:9190`.
-8. Explicar Kubernetes, CI/CD e Terraform.
+3. Rodar `docker compose down --remove-orphans`.
+4. Rodar `docker compose up --build`.
+5. Abrir `http://localhost:3100`.
+6. Listar insumos em `/supplies`.
+7. Criar agendamento com `POST /appointments`.
+8. Mostrar Prometheus em `http://localhost:9190`.
+9. Explicar Kubernetes, CI/CD e Terraform.

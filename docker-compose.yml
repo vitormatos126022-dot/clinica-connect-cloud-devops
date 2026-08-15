@@ -1,7 +1,6 @@
 ﻿services:
   postgres:
     image: postgres:16-alpine
-    container_name: clinica-connect-postgres
     environment:
       POSTGRES_USER: clinic_user
       POSTGRES_PASSWORD: clinic_pass
@@ -23,7 +22,6 @@
     build:
       context: .
       target: runtime
-    container_name: clinica-connect-gateway
     command: ["node", "src/services/api-gateway/server.js"]
     env_file: .env.example
     ports:
@@ -44,7 +42,6 @@
     build:
       context: .
       target: runtime
-    container_name: clinica-connect-appointments
     command: ["node", "src/services/appointments/server.js"]
     env_file: .env.example
     ports:
@@ -63,7 +60,6 @@
     build:
       context: .
       target: runtime
-    container_name: clinica-connect-stock
     command: ["node", "src/services/stock/server.js"]
     env_file: .env.example
     ports:
@@ -78,7 +74,6 @@
     build:
       context: .
       target: runtime
-    container_name: clinica-connect-notifications
     command: ["node", "src/services/notifications/server.js"]
     env_file: .env.example
     ports:
@@ -88,7 +83,6 @@
 
   prometheus:
     image: prom/prometheus:v2.55.1
-    container_name: clinica-connect-prometheus
     ports:
       - "9190:9090"
     volumes:
@@ -98,7 +92,6 @@
 
   jaeger:
     image: jaegertracing/all-in-one:1.62.0
-    container_name: clinica-connect-jaeger
     ports:
       - "16687:16686"
       - "4320:4318"

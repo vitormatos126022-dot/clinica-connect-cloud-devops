@@ -23,6 +23,7 @@ npm install
 2. Suba os servicos:
 
 ```bash
+docker compose down --remove-orphans
 docker compose up --build
 ```
 
@@ -65,7 +66,7 @@ O script de testes usa `node tests/index.test.js`, sem `--test-isolation=none`, 
 
 ## Kubernetes
 
-Os manifests ficam em `k8s/`:
+Os manifests ficam em `k8s/`. Para validacao local sem cluster ativo, use `kubectl apply --dry-run=client --validate=false -f k8s/`; para deploy real, e necessario um cluster configurado:
 
 ```bash
 kubectl apply -f k8s/
@@ -81,12 +82,18 @@ O workflow `.github/workflows/ci-cd.yml` executa:
 - lint com ESLint;
 - testes automatizados em Node.js 20;
 - validacao do Docker Compose;
+- validacao client-side dos manifests Kubernetes sem exigir cluster ativo;
+- validacao Terraform no GitHub Actions com `hashicorp/setup-terraform`;
 - build e publicacao das imagens no GHCR com `${GITHUB_SHA}` e `latest`;
 - deploy em Kubernetes apenas quando `ENABLE_K8S_DEPLOY=true` e `KUBE_CONFIG` estiver configurado.
 
 ## Case Oficial Comparado
 
 O projeto usa como referencia o case Sock Shop (`microservices-demo/microservices-demo`), uma aplicacao de loja online em microsservicos usada para demonstrar tecnologias cloud-native. A Clinica Connect aplica a mesma ideia de servicos pequenos e independentes, mas em outro dominio: agendamentos clinicos, estoque de insumos e notificacoes.
+
+## Terraform
+
+O diretorio `terraform/` e validado no pipeline com `terraform init -backend=false` e `terraform validate`, portanto o CI nao depende de Terraform instalado no Windows local. Para validar manualmente no computador, instale o Terraform CLI antes de executar esses comandos.
 
 ## Observabilidade
 
